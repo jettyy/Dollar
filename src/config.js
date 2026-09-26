@@ -9,8 +9,8 @@ const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
 const DEFAULTS = Object.freeze({
   telegram: { token: '', chatId: '' },
   currencies: {
-    USD: { enabled: true, threshold: 0.3 },
-    JPY: { enabled: true, threshold: 0.3 },
+    USD: { enabled: true, threshold: 3 },
+    JPY: { enabled: true, threshold: 3 },
   },
   windowMinutes: 5, // 몇 분 전과 비교할지
   pollSeconds: 60, // 환율 조회 주기

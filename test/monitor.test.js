@@ -10,7 +10,9 @@ const MIN = 60000;
 
 function setup({ rates, config = {} }) {
   let now = 1_000_000_000_000;
-  const cfg = applyUpdate(JSON.parse(JSON.stringify(DEFAULTS)), config);
+  // 기본값이 바뀌어도 테스트가 흔들리지 않도록 기준 %를 0.3으로 고정
+  const base = applyUpdate(JSON.parse(JSON.stringify(DEFAULTS)), { currencies: { USD: { threshold: 0.3 }, JPY: { threshold: 0.3 } } });
+  const cfg = applyUpdate(base, config);
   const sent = [];
   const queue = { USD: [...rates.USD], JPY: [...rates.JPY] };
   const monitor = new Monitor({
