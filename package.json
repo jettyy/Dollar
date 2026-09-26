@@ -1,0 +1,15 @@
+{
+  "name": "fx-alert",
+  "version": "1.0.0",
+  "description": "달러/엔화 환율이 N분 전 대비 설정한 % 이상 변동하면 텔레그램으로 알려주는 프로그램",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/monitor.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>환율 급변동 알림</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💱</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>환율 급변동 알림</h1>
+      <p class="sub" id="subtitle">달러 · 엔화 환율 변동을 감시해 텔레그램으로 알려드려요</p>
+    </div>
+    <div class="controls">
+      <div class="status" id="status"><span class="dot"></span><span class="text">연결 중…</span></div>
+      <button class="btn" id="checkBtn" type="button">지금 확인</button>
+      <button class="btn primary" id="toggleBtn" type="button">시작</button>
+    </div>
+  </header>
+
+  <div class="banner" id="tgBanner" hidden>
+    텔레그램이 아직 설정되지 않았어요. 아래 <b>텔레그램 설정</b>에서 봇 토큰과 채팅 ID를 입력해야 알림을 받을 수 있어요.
+  </div>
+
+  <main>
+    <section class="cards" id="cards"></section>
+
+    <div class="columns">
+      <form class="panel" id="settingsForm" autocomplete="off">
+        <h2>텔레그램 설정</h2>
+        <label class="field">
+          <span>봇 토큰</span>
+          <input type="password" name="token" id="token" placeholder="123456789:ABCdef..." spellcheck="false" />
+          <small id="tokenHint"></small>
+        </label>
+        <label class="field">
+          <span>채팅 ID</span>
+          <div class="inline">
+            <input type="text" name="chatId" id="chatId" placeholder="예: 123456789" spellcheck="false" />
+            <button class="btn" type="button" id="findChatBtn">찾기</button>
+          </div>
+          <div class="chips" id="chatList"></div>
+        </label>
+        <details class="help">
+          <summary>봇 토큰 / 채팅 ID 얻는 법</summary>
+          <ol>
+            <li>텔레그램에서 <b>@BotFather</b> 검색 → <code>/newbot</code> 입력 → 이름 정하면 <b>봇 토큰</b>을 줘요.</li>
+            <li>만든 봇을 검색해 대화방을 열고 아무 메시지나 보내세요. (그룹이면 봇을 초대 후 메시지 전송)</li>
+            <li>위에 토큰을 넣고 <b>찾기</b>를 누르면 채팅 ID가 나타나요. 클릭하면 입력돼요.</li>
+          </ol>
+        </details>
+        <button class="btn" type="button" id="testBtn">테스트 메시지 보내기</button>
+
+        <h2>알림 조건</h2>
+        <div class="rules">
+          <div class="rule">
+            <label class="switch"><input type="checkbox" name="USD_enabled" /><span></span></label>
+            <span class="rule-name">🇺🇸 달러 (USD)</span>
+            <div class="pct"><span>±</span><input type="number" name="USD_threshold" step="0.01" min="0.01" max="50" required /><span>%</span></div>
+          </div>
+          <div class="rule">
+            <label class="switch"><input type="checkbox" name="JPY_enabled" /><span></span></label>
+            <span class="rule-name">🇯🇵 엔화 (JPY, 100엔)</span>
+            <div class="pct"><span>±</span><input type="number" name="JPY_threshold" step="0.01" min="0.01" max="50" required /><span>%</span></div>
+          </div>
+        </div>
+        <p class="note" id="ruleText"></p>
+
+        <div class="grid3">
+          <label class="field">
+            <span>비교 시간 (분 전)</span>
+            <input type="number" name="windowMinutes" min="1" max="240" step="1" required />
+          </label>
+          <label class="field">
+            <span>확인 주기 (초)</span>
+            <input type="number" name="pollSeconds" min="10" max="600" step="1" required />
+          </label>
+          <label class="field">
+            <span>재알림 대기 (분)</span>
+            <input type="number" name="cooldownMinutes" min="0" max="1440" step="1" required />
+          </label>
+        </div>
+        <label class="field">
+          <span>환율 데이터 출처</span>
+          <select name="provider" id="provider"></select>
+          <small>모의 데이터는 인터넷 없이 화면과 알림을 시험해 보는 용도예요.</small>
+        </label>
+
+        <div class="form-actions">
+          <button class="btn primary" type="submit">설정 저장</button>
+        </div>
+      </form>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>알림 기록</h2>
+          <button class="btn ghost small" type="button" id="clearBtn">지우기</button>
+        </div>
+        <ul class="log" id="log"></ul>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

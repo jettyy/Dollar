@@ -1,0 +1,5 @@
+node_modules/
+# 텔레그램 토큰 등 개인 설정과 수집 데이터 (git pull 시 충돌 방지)
+data/
+*.log
+.DS_Store
