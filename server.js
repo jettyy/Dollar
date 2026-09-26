@@ -171,15 +171,45 @@ function openBrowser(url) {
   exec(cmd, () => {});
 }
 
-server.on('error', (e) => {
-  if (e.code === 'EADDRINUSE') {
-    console.error(`포트 ${PORT} 가 이미 사용 중입니다. 이미 실행 중인지 확인하거나 PORT=3001 npm start 처럼 다른 포트를 지정하세요.`);
-  } else console.error(e);
+const urlFor = (port) => `http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${port}`;
+const PORT_FIXED = Boolean(process.env.PORT);
+const MAX_PORT_TRIES = 20;
+let port = PORT;
+
+/** 해당 포트에서 이 프로그램이 이미 실행 중인지 확인 (중복 실행 → 알림 중복 방지) */
+async function isAlreadyRunning(p) {
+  try {
+    const res = await fetch(`http://127.0.0.1:${p}/api/status`, { signal: AbortSignal.timeout(2000) });
+    const data = await res.json();
+    return typeof data.running === 'boolean' && Boolean(data.currencies && data.currencies.USD);
+  } catch {
+    return false;
+  }
+}
+
+server.on('error', async (e) => {
+  if (e.code !== 'EADDRINUSE') {
+    console.error(e);
+    process.exit(1);
+  }
+  if (await isAlreadyRunning(port)) {
+    console.log(`\n  이미 실행 중입니다 → ${urlFor(port)}\n`);
+    openBrowser(urlFor(port));
+    process.exit(0);
+  }
+  // 다른 프로그램이 쓰는 포트면 다음 포트로 자동 이동 (PORT 를 직접 지정한 경우는 제외)
+  if (!PORT_FIXED && port < PORT + MAX_PORT_TRIES) {
+    console.log(`  포트 ${port} 은(는) 다른 프로그램이 사용 중이라 ${port + 1} 번으로 시도합니다.`);
+    port += 1;
+    server.listen(port, HOST);
+    return;
+  }
+  console.error(`포트 ${port} 가 이미 사용 중입니다. PORT=${port + 1} npm start 처럼 다른 포트를 지정하세요.`);
   process.exit(1);
 });
 
-server.listen(PORT, HOST, () => {
-  const url = `http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`;
+server.once('listening', () => {
+  const url = urlFor(port);
   console.log('');
   console.log('  💱 환율 급변동 알림 실행 중');
   console.log(`  👉 브라우저에서 열기: ${url}`);
@@ -188,6 +218,8 @@ server.listen(PORT, HOST, () => {
   if (config.get().autoStart) monitor.start();
   openBrowser(url);
 });
+
+server.listen(port, HOST);
 
 function shutdown() {
   monitor.stop();

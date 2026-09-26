@@ -16,7 +16,8 @@ npm start       # 실행 → 브라우저가 자동으로 http://127.0.0.1:3000 
 ```
 
 - 종료: 터미널에서 `Ctrl + C`
-- 포트 변경: `PORT=3001 npm start` (Windows PowerShell: `$env:PORT=3001; npm start`)
+- 3000번 포트를 다른 프로그램이 쓰고 있으면 3001, 3002… 로 자동으로 바꿔 실행합니다. 이미 이 프로그램이 켜져 있으면 새로 띄우지 않고 기존 화면을 엽니다.
+- 포트 직접 지정: `PORT=3100 npm start` (Windows PowerShell: `$env:PORT=3100; npm start`)
 - 브라우저 자동 열기 끄기: `NO_OPEN=1 npm start`
 - 브라우저 창은 닫아도 됩니다. **터미널(프로그램)이 켜져 있는 동안** 계속 감시하고 알림을 보냅니다.
 
